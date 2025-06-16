@@ -1,9 +1,10 @@
 import 'package:achlys/colorThemes/colors.dart';
 import 'package:achlys/pages/analytics.dart';
 import 'package:achlys/pages/library.dart';
+import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:achlys/pages/homepage.dart';
-import 'package:stylish_bottom_bar/stylish_bottom_bar.dart';
+
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -15,6 +16,7 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> {
 
   int selectedIndex = 0;
+  final GlobalKey<CurvedNavigationBarState> _bottomNavigationKey = GlobalKey();
   List<Widget> pages = [Homepage(), LibraryPage(), AnalyticsPage()];
   final PageController pageController = PageController();
 
@@ -24,29 +26,31 @@ class _MainScreenState extends State<MainScreen> {
       extendBody: true,
       body: PageView(
         controller: pageController,
-        children: pages,
+        physics: NeverScrollableScrollPhysics(),
+        children: pages
       ),
-
-      bottomNavigationBar: StylishBottomBar(
-        backgroundColor: colorThemes[0]['colorDark'],
-        option: AnimatedBarOptions(
-          iconStyle: IconStyle.animated,
-          barAnimation: BarAnimation.blink,
+      bottomNavigationBar: SafeArea(
+        child: CurvedNavigationBar(
+          height: 60,
+          maxWidth: double.infinity,
+          key: _bottomNavigationKey,
+          items: [
+            Icon(Icons.home, color: colorThemes[0]['colorLight'],),
+            Icon(Icons.library_books, color: colorThemes[0]['colorLight'],),
+            Icon(Icons.analytics, color: colorThemes[0]['colorLight'],)
+          ],
+          color: colorThemes[0]['colorDark'] as Color,
+          backgroundColor: colorThemes[0]['colorLight'] as Color,
+          animationDuration: const Duration(milliseconds: 100),
+          onTap: (index) {
+            setState(() {
+              selectedIndex = index;
+            });
+            pageController.jumpToPage(index);
+          }
         ),
-        items: [
-          BottomBarItem(icon: Icon(Icons.home), title: const Text("Home"), backgroundColor: colorThemes[0]['colorLight']),
-          BottomBarItem(icon: Icon(Icons.library_books), title: const Text("Library"), backgroundColor: colorThemes[0]['colorLight']),
-          BottomBarItem(icon: Icon(Icons.analytics), title: const Text("Analytics"), backgroundColor: colorThemes[0]['colorLight']),
-        ],
-        fabLocation: StylishBarFabLocation.end,
-        currentIndex: selectedIndex,
-        onTap: (index) {
-          setState(() {
-            selectedIndex = index;
-          });
-          pageController.jumpToPage(index);
-        },
-        ),
+      ),
     );
   }
 }
+
