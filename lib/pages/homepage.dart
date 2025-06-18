@@ -84,7 +84,7 @@ class _HomepageState extends State<Homepage> {
             Padding(
               padding: const EdgeInsets.all(12),
               child: Text("History", style: TextStyle(color: colorThemes[0]['colorDark'], fontSize: 20, fontWeight: FontWeight.bold)),
-            ),          
+            ),            
           ],
         ),
       ),
