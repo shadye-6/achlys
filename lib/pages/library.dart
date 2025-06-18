@@ -1,5 +1,4 @@
 import 'package:achlys/colorThemes/colors.dart';
-import 'package:achlys/functions/shelves.dart';
 import 'package:achlys/widgets/createshelfbox.dart';
 import 'package:achlys/widgets/searchbar.dart';
 import 'package:flutter/material.dart';
@@ -12,6 +11,17 @@ class LibraryPage extends StatefulWidget {
 }
 
 class _LibraryPageState extends State<LibraryPage> {
+
+  final List myShelves = ['1', '2', '3', '4'];
+
+  void updateShelves(int oldIndex, int newIndex){
+    setState(() {
+      if (oldIndex < newIndex) newIndex--;
+
+      final String shelf = myShelves.removeAt(oldIndex);
+      myShelves.insert(newIndex, shelf);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -39,8 +49,18 @@ class _LibraryPageState extends State<LibraryPage> {
           Expanded(
             child: ReorderableListView(
               padding: const EdgeInsets.all(12),
-              onReorder: (oldIndex, newIndex) {},
+              onReorder: (oldIndex, newIndex) {updateShelves(oldIndex, newIndex);},
               children: [
+                for (final shelf in myShelves) 
+                  Padding(
+                    key: ValueKey(shelf),
+                    padding: EdgeInsets.all(8),
+                    child: Container(
+                      color: colorThemes[0]['colorMed'],
+                      height: 100,
+                      width: double.infinity,
+                    ),
+                  )
               ],
             ),
           ),

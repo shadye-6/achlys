@@ -1,4 +1,4 @@
-import 'package:achlys/pages/pagehavingbar.dart';
+import 'package:achlys/pages/mainpage.dart';
 import 'package:flutter/material.dart';
 
 void main() {

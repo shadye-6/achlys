@@ -1,6 +1,5 @@
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 Future<Directory> getShelvesBaseDir() async {
   final baseDir = await getApplicationDocumentsDirectory();
@@ -37,12 +36,3 @@ Future<List<String>> listShelves() async {
   return dirs.whereType<Directory>().map((d) => d.path.split('/').last).toList();
 }
 
-Future<void> saveShelfOrder(List<String> shelfOrder) async {
-  final prefs = await SharedPreferences.getInstance();
-  await prefs.setStringList('shelfOrder', shelfOrder);
-}
-
-Future<List<String>> loadShelfOrder() async {
-  final prefs = await SharedPreferences.getInstance();
-  return prefs.getStringList('shelfOrder') ?? [];
-}
