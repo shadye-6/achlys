@@ -14,8 +14,7 @@ class _HomepageState extends State<Homepage> {
   String favBook = "favbook";
   @override
   Widget build(BuildContext context) {
-    // ignore: unused_local_variable
-    double devHeight =  MediaQuery.of(context).size.height;
+
     return Scaffold(
       backgroundColor: colorThemes[0]['colorLight'],
       body: SingleChildScrollView(
@@ -59,9 +58,9 @@ class _HomepageState extends State<Homepage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text("Welcome back $username.", style: TextStyle(color: colorThemes[0]['colorLight'], fontSize: 17),overflow: TextOverflow.ellipsis, maxLines: 1,),
-                        Text("Your favourite book is $favBook.", style: TextStyle(color: colorThemes[0]['colorLight'], fontSize: 17),overflow: TextOverflow.ellipsis, maxLines: 2,),
-                        Text("Your total time read is $timeRead hours." , style: TextStyle(color: colorThemes[0]['colorLight'], fontSize: 17),overflow: TextOverflow.ellipsis, maxLines: 1,)
+                        Text("Welcome back $username.", style: TextStyle(color: colorThemes[0]['colorLight'], fontSize: 15),overflow: TextOverflow.ellipsis, maxLines: 1,),
+                        Text("Your favourite book is $favBook.", style: TextStyle(color: colorThemes[0]['colorLight'], fontSize: 15),overflow: TextOverflow.ellipsis, maxLines: 2,),
+                        Text("Your total time read is $timeRead hours." , style: TextStyle(color: colorThemes[0]['colorLight'], fontSize: 15),overflow: TextOverflow.ellipsis, maxLines: 1,)
                       ],
                     )),
                     IconButton(onPressed: () {}, icon: Icon(Icons.edit), color: colorThemes[0]['colorLight'],)
@@ -73,7 +72,7 @@ class _HomepageState extends State<Homepage> {
             SizedBox(height: 12,),
             Padding(
               padding: const EdgeInsets.all(12),
-              child: Text("Favourites", style: TextStyle(color: colorThemes[0]['colorDark'], fontSize: 20, fontWeight: FontWeight.bold)),
+              child: Text("Favourites", style: TextStyle(color: colorThemes[0]['colorDark'], fontSize: 18, fontWeight: FontWeight.bold)),
             ),
             Container(
               color: colorThemes[0]['colorMed'],
@@ -83,7 +82,7 @@ class _HomepageState extends State<Homepage> {
             SizedBox(height: 12,),
             Padding(
               padding: const EdgeInsets.all(12),
-              child: Text("History", style: TextStyle(color: colorThemes[0]['colorDark'], fontSize: 20, fontWeight: FontWeight.bold)),
+              child: Text("History", style: TextStyle(color: colorThemes[0]['colorDark'], fontSize: 18, fontWeight: FontWeight.bold)),
             ),            
           ],
         ),
