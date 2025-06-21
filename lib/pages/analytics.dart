@@ -14,7 +14,7 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
     return Scaffold(
       backgroundColor: colorThemes[0]['colorLight'],
       body: Center(
-        child: Text("Analytics"),
+        child: Text("Coming Soon ..."),
       ),
     );
   }

@@ -1,7 +1,7 @@
 import 'package:achlys/pages/mainpage.dart';
 import 'package:flutter/material.dart';
 
-void main() {
+void main() { 
   runApp(const MyApp());
 }
 

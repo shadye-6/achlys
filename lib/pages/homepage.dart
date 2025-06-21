@@ -23,7 +23,7 @@ class _HomepageState extends State<Homepage> {
           children: [
             //top bar
             Container(
-              height: 200,
+              height: 160,
               width: double.infinity,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.only(
@@ -77,7 +77,7 @@ class _HomepageState extends State<Homepage> {
             Container(
               color: colorThemes[0]['colorMed'],
               width: double.infinity,
-              height: 200,
+              height: 170,
             ),
             SizedBox(height: 12,),
             Padding(

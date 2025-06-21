@@ -1,6 +1,11 @@
+import 'dart:io';
+
 import 'package:achlys/colorThemes/colors.dart';
+import 'package:achlys/functions/pdfs.dart';
 import 'package:achlys/functions/shelves.dart';
 import 'package:achlys/widgets/createshelfbox.dart';
+import 'package:achlys/widgets/editshelfbox.dart';
+import 'package:achlys/widgets/pdfcard.dart';
 import 'package:achlys/widgets/searchbar.dart';
 import 'package:flutter/material.dart';
 
@@ -37,6 +42,32 @@ class _LibraryPageState extends State<LibraryPage> {
         });
         await saveShelves(shelfList);
       }
+    }
+  }
+
+  //locally delete
+  void _deleteShelf(String shelfName) async {
+    await deleteShelf(shelfName); 
+    setState(() {
+      shelfList.remove(shelfName); 
+    });
+    await saveShelves(shelfList); 
+  }
+
+  //locally rename
+  void _renameShelf(String oldName, String newName) async {
+    try {
+      await renameShelf(oldName, newName);
+      setState(() {
+        final index = shelfList.indexOf(oldName);
+        if (index != -1) {
+          shelfList[index] = newName;
+        }
+      });
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e.toString())),
+      );
     }
   }
 
@@ -79,16 +110,87 @@ class _LibraryPageState extends State<LibraryPage> {
                   for (final shelf in shelfList)
                     Container(
                       key: ValueKey(shelf),
-                      height: 150,
                       margin: const EdgeInsets.symmetric(vertical: 8),
-                      decoration: BoxDecoration(
-                        color: colorThemes[0]['colorMed'],
-                        borderRadius: BorderRadius.circular(12),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Expanded(
+                                child: Tooltip(
+                                  message: shelf,
+                                  child: Text(
+                                    shelf,
+                                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                                    overflow: TextOverflow.ellipsis,
+                                    maxLines: 1,
+                                  ),
+                                ),
+                              ),
+                              Row(
+                                children: [
+                                  IconButton(
+                                    icon: const Icon(Icons.add),
+                                    onPressed: () async {
+                                      await pickAndAddPdfToShelf(shelf);
+                                      setState(() {});
+                                    },
+                                  ),
+                                  IconButton(
+                                    icon: const Icon(Icons.more_vert),
+                                    onPressed: () {
+                                      showShelfOptionsDialog(
+                                        context,
+                                        currentShelfName: shelf,
+                                        onRename: (newName) => _renameShelf(shelf, newName),
+                                        onDelete: () => _deleteShelf(shelf),
+                                      );
+                                    },
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 6),
+                          Container(
+                            height: 150,
+                            width: double.infinity,
+                            decoration: BoxDecoration(
+                              color: colorThemes[0]['colorMed'],
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: FutureBuilder<List<FileSystemEntity>>(
+                              future: getPdfsInShelf(shelf),
+                              builder: (context, snapshot) {
+                                if (!snapshot.hasData) return const Center(child: CircularProgressIndicator());
+
+                                final pdfs = snapshot.data!;
+                                if (pdfs.isEmpty) {
+                                  return const Center(child: Text("No PDFs yet"));
+                                }
+
+                                return ListView.builder(
+                                  scrollDirection: Axis.horizontal,
+                                  itemCount: pdfs.length,
+                                  itemBuilder: (context, index) {
+                                    return PdfCard(
+                                      file: pdfs[index],
+                                      onEdit: () {
+                                        //for renaming pdf / adding custom image cover
+                                      },
+                                    );
+                                  },
+                                );
+                              },
+                            ),
+                          ),
+                        ],
                       ),
-                      child: Center(child: Text(shelf),),
                     ),
                 ],
               ),
+
             ),
             const SizedBox(height: 20),
           ],

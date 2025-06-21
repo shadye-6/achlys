@@ -55,3 +55,27 @@ Future<List<String>> loadShelvesFromPrefs() async {
   final prefs = await SharedPreferences.getInstance();
   return prefs.getStringList(shelfKey) ?? [];
 }
+
+
+//rename shelf
+Future<void> renameShelf(String oldName, String newName) async {
+  final baseDir = await getApplicationDocumentsDirectory();
+  final oldShelf = Directory('${baseDir.path}/shelves/$oldName');
+  final newShelf = Directory('${baseDir.path}/shelves/$newName');
+
+  if (await newShelf.exists()) {
+    throw Exception("A shelf with that name already exists.");
+  }
+
+  if (await oldShelf.exists()) {
+    await oldShelf.rename(newShelf.path);
+  }
+  final prefs = await SharedPreferences.getInstance();
+  final shelfList = prefs.getStringList('shelfList') ?? [];
+  final index = shelfList.indexOf(oldName);
+
+  if (index != -1) {
+    shelfList[index] = newName;
+    await prefs.setStringList('shelfList', shelfList);
+  }
+}

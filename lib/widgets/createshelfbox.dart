@@ -1,36 +1,47 @@
 import 'package:flutter/material.dart';
 
-void showCreateShelfDialog(
+void showShelfOptionsDialog(
   BuildContext context, {
-  required Function(String) onShelfCreated,
+  required String currentShelfName,
+  required Function(String newName) onRename,
+  required Function() onDelete,
 }) {
-  final TextEditingController controller = TextEditingController();
+  final TextEditingController controller = TextEditingController(text: currentShelfName);
 
   showDialog(
     context: context,
     builder: (context) => AlertDialog(
-      title: const Text("Create Shelf"),
+      title: const Text("Shelf Options"),
       content: TextField(
         controller: controller,
         decoration: InputDecoration(
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(20)),
-          hintText: "Enter a unique shelf name",
+          labelText: "New Shelf Name",
+          hintText: "Enter a unique name",
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
         ),
       ),
       actions: [
-        IconButton(
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text("Cancel"),
+        ),
+        TextButton(
           onPressed: () {
-            final input = controller.text.trim();
-            if (input.isNotEmpty) {
-              onShelfCreated(input);
+            final newName = controller.text.trim();
+            if (newName.isNotEmpty && newName != currentShelfName) {
+              onRename(newName);
               Navigator.pop(context);
             }
           },
-          icon: const Icon(Icons.done),
+          child: const Text("Rename"),
         ),
-        IconButton(
-          onPressed: () => Navigator.pop(context),
-          icon: const Icon(Icons.cancel),
+        TextButton(
+          style: TextButton.styleFrom(foregroundColor: Colors.red),
+          onPressed: () {
+            onDelete();
+            Navigator.pop(context);
+          },
+          child: const Text("Delete"),
         ),
       ],
     ),
