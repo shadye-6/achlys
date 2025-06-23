@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:achlys/colorThemes/colors.dart';
+import 'package:achlys/pages/pdfviewer.dart';
 import 'package:flutter/material.dart';
 
 class PdfCard extends StatelessWidget {
@@ -21,8 +22,8 @@ class PdfCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(8),
         boxShadow: [
           BoxShadow(
-            color: Colors.black12,
-            blurRadius: 4,
+            color: Colors.black26,
+            blurRadius: 6,
             offset: Offset(4, 4),
           ),
         ],
@@ -30,20 +31,38 @@ class PdfCard extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.picture_as_pdf, size: 40, color: colorThemes[0]['colorDark'],),
-          const SizedBox(height: 6),
-          Text(
-            fileName,
-            style: const TextStyle(fontSize: 12),
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-            textAlign: TextAlign.center,
+          GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => PdfViewerPage(file: File(file.path))),
+              );
+            },
+            child: Icon(Icons.picture_as_pdf, size: 40, color: colorThemes[0]['colorDark']),
           ),
-          IconButton(onPressed: () {}, icon: Icon(Icons.edit),iconSize: 15,)
+          const SizedBox(height: 6),
+          GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => PdfViewerPage(file: File(file.path))),
+              );
+            },
+            child: Text(
+              fileName,
+              style: const TextStyle(fontSize: 12),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              textAlign: TextAlign.center,
+            ),
+          ),
+          IconButton(
+            onPressed: onEdit,
+            icon: Icon(Icons.edit),
+            iconSize: 15,
+          )
         ],
       ),
     );
-
-
   }
 }

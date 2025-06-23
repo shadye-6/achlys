@@ -63,7 +63,10 @@ class _HomepageState extends State<Homepage> {
                         Text("Your total time read is $timeRead hours." , style: TextStyle(color: colorThemes[0]['colorLight'], fontSize: 15),overflow: TextOverflow.ellipsis, maxLines: 1,)
                       ],
                     )),
-                    IconButton(onPressed: () {}, icon: Icon(Icons.edit), color: colorThemes[0]['colorLight'],)
+                    IconButton(onPressed: () {
+                      //open new window to edit profile
+                    }, 
+                    icon: Icon(Icons.more), color: colorThemes[0]['colorLight'],)
                   ],
                 ),
               ),
@@ -72,17 +75,22 @@ class _HomepageState extends State<Homepage> {
             SizedBox(height: 12,),
             Padding(
               padding: const EdgeInsets.all(12),
-              child: Text("Favourites", style: TextStyle(color: colorThemes[0]['colorDark'], fontSize: 18, fontWeight: FontWeight.bold)),
+              child: Text("Favourites", style: TextStyle(color: colorThemes[0]['colorDark'], fontSize: 17, fontWeight: FontWeight.bold)),
             ),
             Container(
               color: colorThemes[0]['colorMed'],
               width: double.infinity,
-              height: 170,
+              height: 150,
             ),
             SizedBox(height: 12,),
             Padding(
               padding: const EdgeInsets.all(12),
-              child: Text("History", style: TextStyle(color: colorThemes[0]['colorDark'], fontSize: 18, fontWeight: FontWeight.bold)),
+              child: Text("History", style: TextStyle(color: colorThemes[0]['colorDark'], fontSize: 17, fontWeight: FontWeight.bold)),
+            ),
+            Container(
+              color: colorThemes[0]['colorMed'],
+              width: double.infinity,
+              height: 150,
             ),            
           ],
         ),

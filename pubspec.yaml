@@ -38,6 +38,7 @@ dependencies:
   path_provider: ^2.1.5
   shared_preferences: ^2.5.3
   file_picker: ^10.2.0
+  syncfusion_flutter_pdfviewer: ^29.2.11
 
 
 dev_dependencies:

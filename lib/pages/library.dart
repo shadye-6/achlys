@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:achlys/colorThemes/colors.dart';
 import 'package:achlys/functions/pdfs.dart';
 import 'package:achlys/functions/shelves.dart';
@@ -18,43 +17,46 @@ class LibraryPage extends StatefulWidget {
 
 class _LibraryPageState extends State<LibraryPage> {
   List<String> shelfList = [];
+  Map<String, bool> expandedShelves = {}; 
 
   @override
-  //loading upon revisiting
   void initState() {
     super.initState();
     _loadShelves();
   }
 
-  //locally loading
   Future<void> _loadShelves() async {
     final shelves = await loadShelvesFromPrefs();
-    setState(() => shelfList = shelves);
+    setState(() {
+      shelfList = shelves;
+      for (var shelf in shelves) {
+        expandedShelves[shelf] = true;
+      }
+    });
   }
 
-  //locally adding
   void _addShelf(String shelfName) async {
     if (!shelfList.contains(shelfName)) {
       final created = await createShelf(shelfName);
       if (created) {
         setState(() {
           shelfList.add(shelfName);
+          expandedShelves[shelfName] = true;
         });
         await saveShelves(shelfList);
       }
     }
   }
 
-  //locally delete
   void _deleteShelf(String shelfName) async {
-    await deleteShelf(shelfName); 
+    await deleteShelf(shelfName);
     setState(() {
-      shelfList.remove(shelfName); 
+      shelfList.remove(shelfName);
+      expandedShelves.remove(shelfName);
     });
-    await saveShelves(shelfList); 
+    await saveShelves(shelfList);
   }
 
-  //locally rename
   void _renameShelf(String oldName, String newName) async {
     try {
       await renameShelf(oldName, newName);
@@ -62,16 +64,16 @@ class _LibraryPageState extends State<LibraryPage> {
         final index = shelfList.indexOf(oldName);
         if (index != -1) {
           shelfList[index] = newName;
+          expandedShelves[newName] = expandedShelves[oldName] ?? true;
+          expandedShelves.remove(oldName);
         }
       });
+      await saveShelves(shelfList);
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(e.toString())),
-      );
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString())));
     }
   }
 
-  //locally reordering
   void _reorderShelves(int oldIndex, int newIndex) async {
     setState(() {
       if (oldIndex < newIndex) newIndex--;
@@ -81,17 +83,23 @@ class _LibraryPageState extends State<LibraryPage> {
     await saveShelves(shelfList);
   }
 
+  void _toggleShelf(String shelf) {
+    setState(() {
+      expandedShelves[shelf] = !(expandedShelves[shelf] ?? true);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
+      top: false,
       child: Scaffold(
         backgroundColor: colorThemes[0]['colorLight'],
         body: Column(
           children: [
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: SearchBarBlank(),
-            ),
+            SafeArea(child: Padding(
+              padding: EdgeInsets.fromLTRB(16, 0, 16, 16),
+              child: SearchBarBlank())),
             ElevatedButton.icon(
               onPressed: () => showCreateShelfDialog(context, onShelfCreated: _addShelf),
               label: Text("Create New Shelf", style: TextStyle(color: colorThemes[0]['colorLight'])),
@@ -114,6 +122,7 @@ class _LibraryPageState extends State<LibraryPage> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
+                          // Header
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
@@ -122,7 +131,10 @@ class _LibraryPageState extends State<LibraryPage> {
                                   message: shelf,
                                   child: Text(
                                     shelf,
-                                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                                    style: TextStyle(
+                                        fontSize: 17,
+                                        fontWeight: FontWeight.bold,
+                                        color: colorThemes[0]['colorDark']),
                                     overflow: TextOverflow.ellipsis,
                                     maxLines: 1,
                                   ),
@@ -131,14 +143,14 @@ class _LibraryPageState extends State<LibraryPage> {
                               Row(
                                 children: [
                                   IconButton(
-                                    icon: const Icon(Icons.add),
+                                    icon: Icon(Icons.add, color: colorThemes[0]['colorDark']),
                                     onPressed: () async {
                                       await pickAndAddPdfToShelf(shelf);
                                       setState(() {});
                                     },
                                   ),
                                   IconButton(
-                                    icon: const Icon(Icons.more_vert),
+                                    icon: Icon(Icons.more_vert, color: colorThemes[0]['colorDark']),
                                     onPressed: () {
                                       showShelfOptionsDialog(
                                         context,
@@ -148,51 +160,68 @@ class _LibraryPageState extends State<LibraryPage> {
                                       );
                                     },
                                   ),
+                                  IconButton(
+                                    icon: Icon(
+                                      expandedShelves[shelf] == true
+                                          ? Icons.arrow_right
+                                          : Icons.arrow_drop_down,
+                                      color: colorThemes[0]['colorDark'],
+                                    ),
+                                    onPressed: () => _toggleShelf(shelf),
+                                  )
                                 ],
                               ),
                             ],
                           ),
-                          const SizedBox(height: 6),
-                          Container(
-                            height: 150,
-                            width: double.infinity,
-                            decoration: BoxDecoration(
-                              color: colorThemes[0]['colorMed'],
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: FutureBuilder<List<FileSystemEntity>>(
-                              future: getPdfsInShelf(shelf),
-                              builder: (context, snapshot) {
-                                if (!snapshot.hasData) return const Center(child: CircularProgressIndicator());
-
-                                final pdfs = snapshot.data!;
-                                if (pdfs.isEmpty) {
-                                  return const Center(child: Text("No PDFs yet"));
-                                }
-
-                                return ListView.builder(
-                                  scrollDirection: Axis.horizontal,
-                                  itemCount: pdfs.length,
-                                  itemBuilder: (context, index) {
-                                    return PdfCard(
-                                      file: pdfs[index],
-                                      onEdit: () {
-                                        //for renaming pdf / adding custom image cover
-                                      },
+        
+              
+                          if (expandedShelves[shelf] == true)
+                            Container(
+                              height: 150,
+                              width: double.infinity,
+                              decoration: BoxDecoration(
+                                color: colorThemes[0]['colorMed'],
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: FutureBuilder<List<FileSystemEntity>>(
+                                future: getPdfsInShelf(shelf),
+                                builder: (context, snapshot) {
+                                  if (!snapshot.hasData) {
+                                    return const Center(child: CircularProgressIndicator());
+                                  }
+        
+                                  final pdfs = snapshot.data!;
+                                  if (pdfs.isEmpty) {
+                                    return Center(
+                                      child: Text(
+                                        "No PDFs yet",
+                                        style: TextStyle(color: colorThemes[0]['colorDark']),
+                                      ),
                                     );
-                                  },
-                                );
-                              },
+                                  }
+        
+                                  return ListView.builder(
+                                    scrollDirection: Axis.horizontal,
+                                    itemCount: pdfs.length,
+                                    itemBuilder: (context, index) {
+                                      return PdfCard(
+                                        file: pdfs[index],
+                                        onEdit: () {
+                                          // handle edit
+                                        },
+                                      );
+                                    },
+                                  );
+                                },
+                              ),
                             ),
-                          ),
                         ],
                       ),
                     ),
                 ],
               ),
-
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 10),
           ],
         ),
       ),
