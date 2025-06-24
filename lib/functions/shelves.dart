@@ -4,7 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 const String shelfKey = 'shelf_list';
 
-// Returns the base directory where all shelves are stored
+// directory of shelf
 Future<Directory> getShelvesBaseDir() async {
   final baseDir = await getApplicationDocumentsDirectory();
   final shelvesDir = Directory('${baseDir.path}/shelves');
@@ -14,7 +14,7 @@ Future<Directory> getShelvesBaseDir() async {
   return shelvesDir;
 }
 
-// Creates a shelf (folder) with the given name if it doesn't already exist
+// creates unique shelf only
 Future<bool> createShelf(String shelfName) async {
   final shelvesDir = await getShelvesBaseDir();
   final newShelf = Directory('${shelvesDir.path}/$shelfName');
@@ -25,7 +25,7 @@ Future<bool> createShelf(String shelfName) async {
   return false;
 }
 
-// Deletes the specified shelf (folder)
+// delete the shelf
 Future<void> deleteShelf(String shelfName) async {
   final shelvesDir = await getShelvesBaseDir();
   final shelf = Directory('${shelvesDir.path}/$shelfName');
@@ -34,7 +34,7 @@ Future<void> deleteShelf(String shelfName) async {
   }
 }
 
-// Lists all shelf folder names stored in the shelves directory
+// list of all shelves
 Future<List<String>> listShelves() async {
   final shelvesDir = await getShelvesBaseDir();
   final items = shelvesDir.listSync();
@@ -44,13 +44,13 @@ Future<List<String>> listShelves() async {
       .toList();
 }
 
-// Saves the list of shelf names to shared preferences
+//saves order of shelves
 Future<void> saveShelves(List<String> shelves) async {
   final prefs = await SharedPreferences.getInstance();
   await prefs.setStringList(shelfKey, shelves);
 }
 
-// Loads the list of shelf names from shared preferences
+//gets the list of shelves
 Future<List<String>> loadShelvesFromPrefs() async {
   final prefs = await SharedPreferences.getInstance();
   return prefs.getStringList(shelfKey) ?? [];

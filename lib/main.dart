@@ -1,3 +1,4 @@
+import 'package:achlys/colorThemes/colors.dart';
 import 'package:achlys/pages/mainpage.dart';
 import 'package:flutter/material.dart';
 
@@ -12,6 +13,7 @@ class MyApp extends StatelessWidget {
   
   Widget build(BuildContext context) {
     return MaterialApp(
+      color: colorThemes[0]['colorLight'],
       debugShowCheckedModeBanner: false,
       title: 'Achlys',
       home: MainScreen(),

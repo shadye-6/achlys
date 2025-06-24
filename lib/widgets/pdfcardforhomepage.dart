@@ -1,13 +1,12 @@
 import 'dart:io';
-import 'package:achlys/colorThemes/colors.dart';
 import 'package:achlys/pages/pdfviewer.dart';
+import 'package:achlys/colorThemes/colors.dart';
 import 'package:flutter/material.dart';
 
-class PdfCard extends StatelessWidget {
+class HomePdfCard extends StatelessWidget {
   final FileSystemEntity file;
-  final void Function(BuildContext context, FileSystemEntity file) onEdit;
 
-  const PdfCard({super.key, required this.file, required this.onEdit});
+  const HomePdfCard({super.key, required this.file});
 
   @override
   Widget build(BuildContext context) {
@@ -50,17 +49,12 @@ class PdfCard extends StatelessWidget {
             },
             child: Text(
               fileName,
-              style: const TextStyle(fontSize: 12),
+              style: TextStyle(fontSize: 12, color: colorThemes[0]['colorDark']),
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
               textAlign: TextAlign.center,
             ),
           ),
-          IconButton(
-            onPressed: () => onEdit(context, file) ,
-            icon: Icon(Icons.edit),
-            iconSize: 15,
-          )
         ],
       ),
     );

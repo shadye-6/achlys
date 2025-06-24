@@ -6,6 +6,9 @@ class PdfViewerDrawer extends StatelessWidget {
   final double scrollSpeed;
   final ValueChanged<bool> onToggleAutoScroll;
   final ValueChanged<double> onScrollSpeedChanged;
+  final String filePath;
+  final bool isFavorite;
+  final VoidCallback onToggleFavorite;
 
   const PdfViewerDrawer({
     super.key,
@@ -13,6 +16,9 @@ class PdfViewerDrawer extends StatelessWidget {
     required this.scrollSpeed,
     required this.onToggleAutoScroll,
     required this.onScrollSpeedChanged,
+    required this.filePath, 
+    required this.isFavorite, 
+    required this.onToggleFavorite,
   });
 
   @override
@@ -21,15 +27,29 @@ class PdfViewerDrawer extends StatelessWidget {
       backgroundColor: colorThemes[0]['colorLight'],
       child: ListView(
         children: [
-          const DrawerHeader(child: Text("Options")),
+          SizedBox(height: 50,),
+          ListTile(
+            title: Text(isFavorite ? "Remove from Favorites" : "Add to Favorites"),
+            trailing: Icon(isFavorite ? Icons.favorite : Icons.favorite_border,),
+            iconColor: colorThemes[0]['colorDark'],
+            hoverColor: colorThemes[0]['colorMed'],
+            splashColor: colorThemes[0]['colorMed'],
+            onTap: onToggleFavorite,
+          ),
           SwitchListTile(
-            title: const Text("Auto Scroll"),
+            trackOutlineColor:WidgetStatePropertyAll(colorThemes[0]['colorDark']),
+            inactiveTrackColor: colorThemes[0]['colorMed'],
+            inactiveThumbColor: colorThemes[0]['colorDark'],
+            activeTrackColor: colorThemes[0]['colorDark'],
+            hoverColor: colorThemes[0]['colorMed'],
+            title: Text("Auto Scroll", style: TextStyle(color: colorThemes[0]['colorDark']),),
             value: autoScroll,
             onChanged: onToggleAutoScroll,
           ),
           ListTile(
-            title: const Text("Scroll Speed"),
+            title: Text("Scroll Speed", style: TextStyle(color: colorThemes[0]['colorDark']),),
             subtitle: Slider(
+              inactiveColor: colorThemes[0]['colorMed'],
               value: scrollSpeed,
               onChanged: onScrollSpeedChanged,
               min: 1,

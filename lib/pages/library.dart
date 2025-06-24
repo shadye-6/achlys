@@ -3,6 +3,7 @@ import 'package:achlys/colorThemes/colors.dart';
 import 'package:achlys/functions/pdfs.dart';
 import 'package:achlys/functions/shelves.dart';
 import 'package:achlys/widgets/createshelfbox.dart';
+import 'package:achlys/widgets/dialogboxforpdf.dart';
 import 'package:achlys/widgets/editshelfbox.dart';
 import 'package:achlys/widgets/pdfcard.dart';
 import 'package:achlys/widgets/searchbar.dart';
@@ -25,6 +26,7 @@ class _LibraryPageState extends State<LibraryPage> {
     _loadShelves();
   }
 
+//locally load all shelves from mem
   Future<void> _loadShelves() async {
     final shelves = await loadShelvesFromPrefs();
     setState(() {
@@ -35,6 +37,7 @@ class _LibraryPageState extends State<LibraryPage> {
     });
   }
 
+//locally add shelf
   void _addShelf(String shelfName) async {
     if (!shelfList.contains(shelfName)) {
       final created = await createShelf(shelfName);
@@ -48,6 +51,7 @@ class _LibraryPageState extends State<LibraryPage> {
     }
   }
 
+//locally delete shelf
   void _deleteShelf(String shelfName) async {
     await deleteShelf(shelfName);
     setState(() {
@@ -57,6 +61,7 @@ class _LibraryPageState extends State<LibraryPage> {
     await saveShelves(shelfList);
   }
 
+//locally rename shelf
   void _renameShelf(String oldName, String newName) async {
     try {
       await renameShelf(oldName, newName);
@@ -74,6 +79,7 @@ class _LibraryPageState extends State<LibraryPage> {
     }
   }
 
+//locally reorder shelf
   void _reorderShelves(int oldIndex, int newIndex) async {
     setState(() {
       if (oldIndex < newIndex) newIndex--;
@@ -83,6 +89,7 @@ class _LibraryPageState extends State<LibraryPage> {
     await saveShelves(shelfList);
   }
 
+//locally minimise the shelf
   void _toggleShelf(String shelf) {
     setState(() {
       expandedShelves[shelf] = !(expandedShelves[shelf] ?? true);
@@ -122,7 +129,6 @@ class _LibraryPageState extends State<LibraryPage> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          // Header
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
@@ -206,8 +212,13 @@ class _LibraryPageState extends State<LibraryPage> {
                                     itemBuilder: (context, index) {
                                       return PdfCard(
                                         file: pdfs[index],
-                                        onEdit: () {
-                                          // handle edit
+                                        onEdit: (context, file) {
+                                          showPdfEditDialog(
+                                            context: context,
+                                            file: file,
+                                            onRename: () => setState(() {}),
+                                            onDelete: () => setState(() {}),
+                                          );
                                         },
                                       );
                                     },

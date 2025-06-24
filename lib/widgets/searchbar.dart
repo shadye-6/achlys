@@ -6,7 +6,8 @@ class SearchBarBlank extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Material( 
+    return Material(
+      color: colorThemes[0]['colorLight'], 
       child: SearchAnchor.bar(
         barBackgroundColor: WidgetStatePropertyAll(colorThemes[0]['colorMed']),
         viewBackgroundColor: colorThemes[0]['colorMed'],

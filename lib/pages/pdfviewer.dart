@@ -18,16 +18,19 @@ class _PdfViewerPageState extends State<PdfViewerPage> {
   late PdfViewerController _controller;
   bool _autoScroll = false;
   bool _isPaused = false;
+  double scrollSpeed = 3.0;
+
+  List<String> _favorites = [];
+  bool _isFavorite = false;
 
   @override
   void initState() {
     super.initState();
     _controller = PdfViewerController();
     _restoreLastPage();
+    _loadFavorites();
   }
 
-  double scrollSpeed = 3.0;
-  
   Future<void> _restoreLastPage() async {
     final prefs = await SharedPreferences.getInstance();
     final lastPage = prefs.getInt('page_${widget.file.path}') ?? 1;
@@ -52,6 +55,30 @@ class _PdfViewerPageState extends State<PdfViewerPage> {
     }
   }
 
+  Future<void> _loadFavorites() async {
+    final prefs = await SharedPreferences.getInstance();
+    _favorites = prefs.getStringList('favorite_pdfs') ?? [];
+    setState(() {
+      _isFavorite = _favorites.contains(widget.file.path);
+    });
+  }
+
+  Future<void> _toggleFavorite() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      if (_isFavorite) {
+        _favorites.remove(widget.file.path);
+      } else {
+        if (_favorites.length >= 10) {
+          _favorites.removeAt(0); // remove oldest
+        }
+        _favorites.add(widget.file.path);
+      }
+      _isFavorite = !_isFavorite;
+    });
+    await prefs.setStringList('favorite_pdfs', _favorites);
+  }
+
   @override
   Widget build(BuildContext context) {
     final isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
@@ -71,29 +98,40 @@ class _PdfViewerPageState extends State<PdfViewerPage> {
             scrollSpeed = val;
           });
         },
+        filePath: widget.file.path,
+        onToggleFavorite: _toggleFavorite,
+        isFavorite: _isFavorite,
       ),
-
-      appBar: isLandscape? null: AppBar(
-        title: Center(
-          child: Text(
-            widget.file.path.split('/').last,
-            overflow: TextOverflow.ellipsis,
-            maxLines: 1,
-            style: TextStyle(fontSize: 18, color: colorThemes[0]['colorDark']),
-          ),
-        ),
-        leading: IconButton(onPressed: () {Navigator.pop(context);}, icon: Icon(Icons.close), color: colorThemes[0]['colorDark'],),
-        actions: [
-          Builder(
-            builder: (context) => IconButton(
-              icon: Icon(Icons.more_vert, color: colorThemes[0]['colorDark'],),
-              onPressed: () {
-                Scaffold.of(context).openDrawer();
-              },
+      appBar: isLandscape
+          ? null
+          : AppBar(
+              backgroundColor: colorThemes[0]['colorLight'],
+              title: Center(
+                child: Text(
+                  widget.file.path.split('/').last,
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
+                  style: TextStyle(fontSize: 18, color: colorThemes[0]['colorDark']),
+                ),
+              ),
+              leading: IconButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                icon: Icon(Icons.close),
+                color: colorThemes[0]['colorDark'],
+              ),
+              actions: [
+                Builder(
+                  builder: (context) => IconButton(
+                    icon: Icon(Icons.more_vert, color: colorThemes[0]['colorDark']),
+                    onPressed: () {
+                      Scaffold.of(context).openDrawer();
+                    },
+                  ),
+                ),
+              ],
             ),
-          ),
-        ],
-      ),
       body: GestureDetector(
         onLongPressStart: (_) => setState(() => _isPaused = true),
         onLongPressEnd: (_) {
@@ -109,5 +147,3 @@ class _PdfViewerPageState extends State<PdfViewerPage> {
     );
   }
 }
-
-
