@@ -1,6 +1,7 @@
 import 'package:achlys/functions/shelves.dart';
 import 'package:file_picker/file_picker.dart';
 import 'dart:io';
+import 'package:path/path.dart' as p; // Add this import
 
 //adds pdf to shelf
 Future<void> pickAndAddPdfToShelf(String shelfName) async {
@@ -11,7 +12,7 @@ Future<void> pickAndAddPdfToShelf(String shelfName) async {
 
   if (result != null && result.files.single.path != null) {
     final sourcePath = result.files.single.path!;
-    final fileName = sourcePath.split('/').last;
+    final fileName = p.basename(sourcePath); // Use p.basename
 
     final shelvesBaseDir = await getShelvesBaseDir();
     final shelfDir = Directory('${shelvesBaseDir.path}/$shelfName');
@@ -30,5 +31,6 @@ Future<List<FileSystemEntity>> getPdfsInShelf(String shelfName) async {
   final dir = await getShelvesBaseDir();
   final shelf = Directory('${dir.path}/$shelfName');
   if (!await shelf.exists()) return [];
-  return shelf.listSync().where((e) => e.path.endsWith('.pdf')).toList();
+  final files = await shelf.list().toList();
+  return files.where((e) => e.path.endsWith('.pdf')).toList();
 }

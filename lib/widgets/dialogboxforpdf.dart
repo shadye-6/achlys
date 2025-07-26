@@ -1,6 +1,6 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
+import 'package:path/path.dart' as p; // Add this import
 
 void showPdfEditDialog({
   required BuildContext context,
@@ -9,7 +9,7 @@ void showPdfEditDialog({
   required VoidCallback onDelete,
 }) {
   final TextEditingController controller = TextEditingController(
-    text: file.path.split('/').last.replaceAll('.pdf', ''),
+    text: p.basename(file.path).replaceAll('.pdf', ''), // Use p.basename
   );
 
   showDialog(
@@ -26,7 +26,7 @@ void showPdfEditDialog({
             final newName = controller.text.trim();
             if (newName.isNotEmpty) {
               final directory = file.parent.path;
-              final newPath = '$directory/$newName.pdf';
+              final newPath = p.join(directory, '$newName.pdf'); // Use p.join
               await File(file.path).rename(newPath);
               onRename();
               Navigator.pop(ctx);

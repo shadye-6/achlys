@@ -4,6 +4,7 @@ import 'package:achlys/widgets/pdfdrawer.dart';
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:path/path.dart' as p; // Add this import
 
 class PdfViewerPage extends StatefulWidget {
   final File file;
@@ -18,9 +19,9 @@ class _PdfViewerPageState extends State<PdfViewerPage> {
   late PdfViewerController _controller;
   bool _autoScroll = false;
   bool _isPaused = false;
-  double scrollSpeed = 3.0;
+  double scrollSpeed = 0.5;
 
-  List<String> _favorites = [];
+  Set<String> _favorites = {};
   bool _isFavorite = false;
 
   @override
@@ -57,26 +58,38 @@ class _PdfViewerPageState extends State<PdfViewerPage> {
 
   Future<void> _loadFavorites() async {
     final prefs = await SharedPreferences.getInstance();
-    _favorites = prefs.getStringList('favorite_pdfs') ?? [];
+    final favs = prefs.getStringList('favorite_pdfs') ?? [];
+    final isFav = favs.contains(widget.file.path);
+
     setState(() {
-      _isFavorite = _favorites.contains(widget.file.path);
+      _favorites = favs.toSet();
+      _isFavorite = isFav;
     });
   }
 
   Future<void> _toggleFavorite() async {
     final prefs = await SharedPreferences.getInstance();
-    setState(() {
-      if (_isFavorite) {
-        _favorites.remove(widget.file.path);
-      } else {
-        if (_favorites.length >= 10) {
-          _favorites.removeAt(0); // remove oldest
-        }
-        _favorites.add(widget.file.path);
+    final currentPath = widget.file.path;
+    bool newIsFavorite = _isFavorite;
+    Set<String> newFavorites = Set.from(_favorites);
+
+    if (_isFavorite) {
+      newFavorites.remove(currentPath);
+      newIsFavorite = false;
+    } else {
+      if (newFavorites.length >= 10) {
+        newFavorites = newFavorites.skip(1).toSet(); // remove oldest
       }
-      _isFavorite = !_isFavorite;
+      newFavorites.add(currentPath);
+      newIsFavorite = true;
+    }
+
+    setState(() {
+      _favorites = newFavorites;
+      _isFavorite = newIsFavorite;
     });
-    await prefs.setStringList('favorite_pdfs', _favorites);
+
+    await prefs.setStringList('favorite_pdfs', _favorites.toList());
   }
 
   @override
@@ -108,7 +121,7 @@ class _PdfViewerPageState extends State<PdfViewerPage> {
               backgroundColor: colorThemes[0]['colorLight'],
               title: Center(
                 child: Text(
-                  widget.file.path.split('/').last,
+                  p.basename(widget.file.path), // Use p.basename
                   overflow: TextOverflow.ellipsis,
                   maxLines: 1,
                   style: TextStyle(fontSize: 18, color: colorThemes[0]['colorDark']),

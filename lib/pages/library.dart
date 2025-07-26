@@ -31,8 +31,9 @@ class _LibraryPageState extends State<LibraryPage> {
     final shelves = await loadShelvesFromPrefs();
     setState(() {
       shelfList = shelves;
+      // Only update expandedShelves for new shelves
       for (var shelf in shelves) {
-        expandedShelves[shelf] = true;
+        expandedShelves[shelf] = expandedShelves[shelf] ?? true;
       }
     });
   }
@@ -69,8 +70,7 @@ class _LibraryPageState extends State<LibraryPage> {
         final index = shelfList.indexOf(oldName);
         if (index != -1) {
           shelfList[index] = newName;
-          expandedShelves[newName] = expandedShelves[oldName] ?? true;
-          expandedShelves.remove(oldName);
+          expandedShelves[newName] = expandedShelves.remove(oldName) ?? true;
         }
       });
       await saveShelves(shelfList);
@@ -216,8 +216,8 @@ class _LibraryPageState extends State<LibraryPage> {
                                           showPdfEditDialog(
                                             context: context,
                                             file: file,
-                                            onRename: () => setState(() {}),
-                                            onDelete: () => setState(() {}),
+                                            onRename: () {},
+                                            onDelete: () {},
                                           );
                                         },
                                       );

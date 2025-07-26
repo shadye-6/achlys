@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:path/path.dart' as p; // Add this import
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -37,10 +38,10 @@ Future<void> deleteShelf(String shelfName) async {
 // list of all shelves
 Future<List<String>> listShelves() async {
   final shelvesDir = await getShelvesBaseDir();
-  final items = shelvesDir.listSync();
+  final items = await shelvesDir.list().toList();
   return items
       .whereType<Directory>()
-      .map((dir) => dir.path.split('/').last)
+      .map((dir) => p.basename(dir.path)) // Use p.basename
       .toList();
 }
 
@@ -71,11 +72,11 @@ Future<void> renameShelf(String oldName, String newName) async {
     await oldShelf.rename(newShelf.path);
   }
   final prefs = await SharedPreferences.getInstance();
-  final shelfList = prefs.getStringList('shelfList') ?? [];
+  final shelfList = prefs.getStringList(shelfKey) ?? [];
   final index = shelfList.indexOf(oldName);
 
   if (index != -1) {
     shelfList[index] = newName;
-    await prefs.setStringList('shelfList', shelfList);
+    await prefs.setStringList(shelfKey, shelfList);
   }
 }

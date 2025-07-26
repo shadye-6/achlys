@@ -1,7 +1,8 @@
 import 'dart:io';
 import 'package:achlys/colorThemes/colors.dart';
-import 'package:achlys/pages/pdfviewer.dart';
 import 'package:flutter/material.dart';
+import 'package:path/path.dart' as p;
+import 'pdf_navigation_helper.dart';
 
 class PdfCard extends StatelessWidget {
   final FileSystemEntity file;
@@ -11,7 +12,7 @@ class PdfCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final fileName = file.path.split('/').last;
+    final fileName = p.basename(file.path); // <-- Use path package here
 
     return Container(
       width: 100,
@@ -33,20 +34,14 @@ class PdfCard extends StatelessWidget {
         children: [
           GestureDetector(
             onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => PdfViewerPage(file: File(file.path))),
-              );
+              openPdf(context, file);
             },
             child: Icon(Icons.picture_as_pdf, size: 40, color: colorThemes[0]['colorDark']),
           ),
           const SizedBox(height: 6),
           GestureDetector(
             onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => PdfViewerPage(file: File(file.path))),
-              );
+              openPdf(context, file);
             },
             child: Text(
               fileName,
